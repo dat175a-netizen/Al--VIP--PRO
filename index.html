@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VIP PRO Giải Bài Tập</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#f2f5ff;font:16px system-ui}
+main{max-width:720px;margin:auto;padding:22px}.hero{padding:24px;border:1px solid #38456a;border-radius:22px;background:linear-gradient(140deg,#172447,#10162b)}
+h1{margin:0 0 8px;font-size:27px}.gold{color:#ffd778}.sub{color:#bac6e4}
+.tabs{display:flex;gap:8px;margin:18px 0}.tab,button{border:1px solid #42537e;background:#1a2747;color:#fff;border-radius:12px;padding:11px 14px;font-weight:650}
+.tab.active{background:#d9a83d;color:#101525}.panel{background:#111a30;border:1px solid #2d3a5b;border-radius:16px;padding:16px;margin:12px 0}
+textarea,input{width:100%;background:#0b1224;color:#fff;border:1px solid #344466;border-radius:12px;padding:12px;font:inherit;margin:8px 0}
+textarea{min-height:130px;resize:vertical}.wide{width:100%;margin-top:8px}.out{white-space:pre-wrap;line-height:1.55;color:#e6edff}
+small{color:#aab8d8}.hidden{display:none}
+</style>
+</head>
+<body><main>
+<div class="hero"><div class="gold">✦ HỌC TẬP • VIP PRO</div><h1>Siêu trợ lý giải bài tập</h1><div class="sub">Giải từng bước • Trình bày dễ hiểu • Tự kiểm tra</div></div>
+<div class="tabs"><button class="tab active" id="aiTab" onclick="show('ai')">AI giải bài</button><button class="tab" id="promptTab" onclick="show('prompt')">Prompt PRO</button></div>
+<section id="ai" class="panel">
+<h3>Gửi bài tập cho AI</h3>
+<textarea id="question" placeholder="Nhập đề bài hoặc nội dung đã chép từ ảnh..."></textarea>
+<input id="endpoint" placeholder="Địa chỉ API backend của bạn (https://...)">
+<button class="wide" onclick="askAI()">Gửi để giải</button>
+<div id="answer" class="out" style="margin-top:14px"></div>
+<small>Để bảo vệ khóa API, ứng dụng gọi backend của bạn. Không đặt secret API key trực tiếp trong APK.</small>
+</section>
+<section id="prompt" class="panel hidden">
+<h3>Prompt ChatGPT VIP PRO</h3>
+<div class="out" id="promptText">Hãy hoạt động như trợ lý học tập VIP PRO. Đọc kỹ đề, xác định dữ kiện, giải từng bước dễ hiểu, giải thích công thức/lập luận, ghi đáp án cuối cùng và tự kiểm tra. Nếu đề mờ hoặc thiếu dữ kiện, hãy hỏi lại thay vì đoán. Bám sát trình độ học sinh THPT. Không cam kết đúng tuyệt đối; hãy trung thực nếu chưa chắc chắn.</div>
+<button class="wide" onclick="copyPrompt()">Sao chép prompt</button><div id="copied" class="sub"></div>
+</section>
+<p><small>Ứng dụng học tập không đảm bảo mọi đáp án đều chính xác. Hãy đối chiếu với sách giáo khoa hoặc giáo viên.</small></p>
+</main>
+<script>
+function show(which){['ai','prompt'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==which));document.getElementById('aiTab').classList.toggle('active',which==='ai');document.getElementById('promptTab').classList.toggle('active',which==='prompt')}
+async function askAI(){
+ const q=document.getElementById('question').value.trim(), url=document.getElementById('endpoint').value.trim(), out=document.getElementById('answer');
+ if(!q){out.textContent='Hãy nhập đề bài trước.';return} if(!url){out.textContent='Bạn cần cấu hình địa chỉ backend AI trước. Bạn vẫn có thể dùng tab Prompt PRO.';return}
+ out.textContent='Đang gửi...';
+ try{const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:q,mode:'step_by_step'})});if(!r.ok)throw new Error('HTTP '+r.status);const data=await r.json();out.textContent=data.answer||data.output||JSON.stringify(data)}
+ catch(e){out.textContent='Không kết nối được backend. Kiểm tra địa chỉ và cấu hình máy chủ. ('+e.message+')'}
+}
+async function copyPrompt(){const t=document.getElementById('promptText').innerText;try{await navigator.clipboard.writeText(t);document.getElementById('copied').textContent='Đã sao chép.'}catch(e){document.getElementById('copied').textContent='Hãy nhấn giữ văn bản để sao chép.'}}
+</script></body></html>
